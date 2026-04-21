@@ -21,20 +21,32 @@ async def test_list_tools():
 
 @pytest.fixture
 def sample_csv():
-    """创建示例 CSV 文件"""
+    """创建示例 CSV 文件，测试后自动清理"""
     content = "name,age,salary\nAlice,30,50000\nBob,25,45000\nCarol,35,60000"
     with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
         f.write(content)
-        return f.name
+        filepath = f.name
+    yield filepath
+    # 清理临时文件
+    try:
+        os.unlink(filepath)
+    except Exception:
+        pass
 
 
 @pytest.fixture
 def sample_json():
-    """创建示例 JSON 文件"""
+    """创建示例 JSON 文件，测试后自动清理"""
     content = '{"name": "test", "value": 42}'
     with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         f.write(content)
-        return f.name
+        filepath = f.name
+    yield filepath
+    # 清理临时文件
+    try:
+        os.unlink(filepath)
+    except Exception:
+        pass
 
 
 @pytest.mark.asyncio
@@ -107,16 +119,3 @@ async def test_call_tool_unknown():
     assert "未知工具" in result[0].text
 
 
-# 清理临时文件
-@pytest.fixture(autouse=True)
-def cleanup(sample_csv, sample_json):
-    """测试完成后清理临时文件"""
-    yield
-    try:
-        os.unlink(sample_csv)
-    except Exception:
-        pass
-    try:
-        os.unlink(sample_json)
-    except Exception:
-        pass

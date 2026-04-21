@@ -1,0 +1,10 @@
+[
+  {"timestamp": "2024-01-01T10:00:00Z", "level": "INFO", "message": "系统启动", "service": "api"},
+  {"timestamp": "2024-01-01T10:05:00Z", "level": "WARN", "message": "连接池接近上限", "service": "db"},
+  {"timestamp": "2024-01-01T10:10:00Z", "level": "ERROR", "message": "用户认证失败", "service": "auth", "user_id": "u123"},
+  {"timestamp": "2024-01-01T10:15:00Z", "level": "INFO", "message": "请求处理完成", "service": "api", "duration_ms": 150},
+  {"timestamp": "2024-01-01T10:20:00Z", "level": "ERROR", "message": "数据库查询超时", "service": "db", "query": "SELECT * FROM orders"},
+  {"timestamp": "2024-01-01T10:25:00Z", "level": "WARN", "message": "内存使用率 85%", "service": "system"},
+  {"timestamp": "2024-01-01T10:30:00Z", "level": "INFO", "message": "任务队列处理完成", "service": "worker"},
+  {"timestamp": "2024-01-01T10:35:00Z", "level": "ERROR", "message": "支付网关响应超时", "service": "payment", "order_id": "o456"}
+]

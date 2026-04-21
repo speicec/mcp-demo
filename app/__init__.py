@@ -1,0 +1,1 @@
+"""MCP Demo Streamlit 应用"""

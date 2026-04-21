@@ -1,7 +1,15 @@
 # servers/sqlite_agent/tools.py
 """SQLite 工具实现"""
 import json
+import re
 import sqlite3
+
+
+def validate_identifier(name: str) -> str:
+    """验证 SQL 标识符（表名/列名），防止 SQL 注入"""
+    if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', name):
+        raise ValueError(f"非法标识符: {name}")
+    return name
 
 
 def execute_query(conn: sqlite3.Connection, query: str) -> str:
@@ -19,6 +27,7 @@ def execute_query(conn: sqlite3.Connection, query: str) -> str:
 
 def create_table(conn: sqlite3.Connection, table_name: str, columns: str) -> str:
     """创建表"""
+    validate_identifier(table_name)
     sql = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns})"
     conn.execute(sql)
     conn.commit()
@@ -27,6 +36,9 @@ def create_table(conn: sqlite3.Connection, table_name: str, columns: str) -> str
 
 def insert_data(conn: sqlite3.Connection, table_name: str, data: dict) -> str:
     """插入数据"""
+    validate_identifier(table_name)
+    for col in data.keys():
+        validate_identifier(col)
     columns = ", ".join(data.keys())
     placeholders = ", ".join(["?" for _ in data])
     values = list(data.values())
@@ -39,6 +51,7 @@ def insert_data(conn: sqlite3.Connection, table_name: str, data: dict) -> str:
 
 def get_table_schema(conn: sqlite3.Connection, table_name: str) -> str:
     """获取表结构"""
+    validate_identifier(table_name)
     cursor = conn.execute(f"PRAGMA table_info({table_name})")
     rows = cursor.fetchall()
     schema = [

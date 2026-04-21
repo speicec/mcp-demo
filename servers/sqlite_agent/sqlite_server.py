@@ -87,6 +87,7 @@ async def call_tool(name: str, arguments: dict):
     if name not in ("execute_query", "create_table", "insert_data", "get_table_schema", "list_tables"):
         return [TextContent(type="text", text=f"未知工具: {name}")]
 
+    conn = None
     try:
         conn = sqlite3.connect(str(DATABASE_PATH))
         conn.row_factory = sqlite3.Row
@@ -100,7 +101,15 @@ async def call_tool(name: str, arguments: dict):
             result = get_table_schema(conn, arguments["table_name"])
         elif name == "list_tables":
             result = list_tables(conn)
-        conn.close()
         return [TextContent(type="text", text=result)]
+    except sqlite3.OperationalError as e:
+        return [TextContent(type="text", text=f"数据库操作错误: {str(e)}")]
+    except sqlite3.IntegrityError as e:
+        return [TextContent(type="text", text=f"数据完整性错误: {str(e)}")]
+    except ValueError as e:
+        return [TextContent(type="text", text=f"参数错误: {str(e)}")]
     except Exception as e:
-        return [TextContent(type="text", text=f"执行错误: {str(e)}")]
+        return [TextContent(type="text", text=f"未知错误: {str(e)}")]
+    finally:
+        if conn:
+            conn.close()
